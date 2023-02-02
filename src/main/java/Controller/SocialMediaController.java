@@ -30,7 +30,7 @@ public SocialMediaController(){
         app.get("example-endpoint", this::exampleHandler);
         app.post("/register", this::postRegisterHandler);
         app.post("/login", this::postLoginHandler);
-        app.start(8080);
+        //app.start(8080);
     
 
         return app;
@@ -53,7 +53,18 @@ public SocialMediaController(){
         }else{
             context.status(400);
         }
+    }
 
+
+    private void postLoginHandler(Context context) throws JsonProcessingException{
+        ObjectMapper mapper = new ObjectMapper();
+        Account account = mapper.readValue(context.body(), Account.class);
+        Account logIn = accountService.Login(account);
+        if(logIn != null){
+            context.json(logIn);
+        }else {
+            context.status(400);
+        }
     }
 }
 
