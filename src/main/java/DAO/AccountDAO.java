@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 import Model.Account;
 import Util.ConnectionUtil;
@@ -15,8 +16,8 @@ public class AccountDAO {
     public Account insertAccount(Account account){
         Connection connection = ConnectionUtil.getConnection();
         try{
-            String sql = "INSERT INTO account (username, password) VALUE (?, ?)";
-            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+            String sql = "INSERT INTO account (username, password) VALUES (?, ?)";
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
 
             preparedStatement.setString(1, account.getUsername());
             preparedStatement.setString(2, account.getPassword());
@@ -24,15 +25,15 @@ public class AccountDAO {
             preparedStatement.executeUpdate();
             ResultSet resultSet = preparedStatement.getGeneratedKeys();
             if(resultSet.next()){
-                int generate_account_id = (int) resultSet.getLong(1);
-                return new Account(generate_account_id, account.getUsername(), account.getPassword());
+                int account_id = (int) resultSet.getLong(1);
+                return new Account(account_id, account.getUsername(), account.getPassword());
             }
     } catch (SQLException e){
         System.out.println(e.getMessage());
     }
     return null;
 }
-    public Account Login(Account account){
+    public Account loginCheck(Account account){
         Connection connection = ConnectionUtil.getConnection();
         try{
             String sql = "SELECT * FROM account WHERE username = ? AND password = ?";
@@ -40,12 +41,13 @@ public class AccountDAO {
 
             preparedStatement.setString(1, account.getUsername());
             preparedStatement.setString(2, account.getPassword());
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if(resultSet.next()){
+
+            ResultSet resultset = preparedStatement.executeQuery();
+            if(resultset.next()){
                 Account login = new Account(
-                    resultSet.getInt(account.account_id),
-                    resultSet.getString(account.username),
-                    resultSet.getString(account.password)
+                    resultset.getInt(account.account_id),
+                    resultset.getString(account.username),
+                    resultset.getString(account.password)
                 );
             return login;
         }
@@ -55,6 +57,7 @@ public class AccountDAO {
     return null;
 
 }
+    
 }
 
 

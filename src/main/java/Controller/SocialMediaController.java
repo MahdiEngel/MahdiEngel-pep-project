@@ -27,7 +27,7 @@ public SocialMediaController(){
      */
     public Javalin startAPI() {
         Javalin app = Javalin.create();
-        app.get("example-endpoint", this::exampleHandler);
+       // app.get("example-endpoint", this::exampleHandler);
         app.post("/register", this::postRegisterHandler);
         app.post("/login", this::postLoginHandler);
         //app.start(8080);
@@ -40,16 +40,16 @@ public SocialMediaController(){
      * This is an example handler for an example endpoint.
      * @param context The Javalin Context object manages information about both the HTTP request and response.
      */
-    private void exampleHandler(Context context) {
-        context.json("sample text");
-    }
+    //private void exampleHandler(Context context) {
+     //   context.json("sample text");
+   // }
 
     private void postRegisterHandler(Context context) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(context.body(), Account.class);
-        Account addedAccount = accountService.addAccount(account);
-        if(addedAccount!=null){
-            context.json(mapper.writeValueAsString(addedAccount));
+        Account newAccount = accountService.addAccount(account);
+        if(newAccount != null){
+            context.json(mapper.writeValueAsString(newAccount));
         }else{
             context.status(400);
         }
@@ -59,11 +59,11 @@ public SocialMediaController(){
     private void postLoginHandler(Context context) throws JsonProcessingException{
         ObjectMapper mapper = new ObjectMapper();
         Account account = mapper.readValue(context.body(), Account.class);
-        Account logIn = accountService.Login(account);
+        Account logIn = accountService.loginCheck(account);
         if(logIn != null){
-            context.json(logIn);
+            context.json(mapper.writeValueAsString(logIn));
         }else {
-            context.status(400);
+            context.status(401);
         }
     }
 }
